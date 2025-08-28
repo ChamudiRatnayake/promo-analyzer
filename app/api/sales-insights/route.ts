@@ -1,8 +1,14 @@
+import { generatePromotionalSuggestions } from '../../../lib/openai';
+
 export async function GET() {
   const generateSalesData = () => {
     const salesData = [];
-    for (let i = 0; i < 14; i++) {
-      salesData.push(Math.floor(Math.random() * (500 - 150 + 1)) + 150);
+    // Ensure a sales drop for testing
+    for (let i = 0; i < 7; i++) { // Last week's sales (higher)
+      salesData.push(Math.floor(Math.random() * (500 - 300 + 1)) + 300);
+    }
+    for (let i = 0; i < 7; i++) { // This week's sales (lower)
+      salesData.push(Math.floor(Math.random() * (250 - 100 + 1)) + 100);
     }
     return salesData;
   };
@@ -14,15 +20,6 @@ export async function GET() {
 
   const lastWeekTotal = lastWeekSales.reduce((sum, sales) => sum + sales, 0);
   const thisWeekTotal = thisWeekSales.reduce((sum, sales) => sum + sales, 0);
-
-  const promotionalSuggestions = [
-    { "title": "10% Lunch Discount", "description": "Boost midday sales", "expectedImpact": "+8%" },
-    { "title": "Happy Hour Special", "description": "2-5 PM promotion", "expectedImpact": "+15%" },
-    { "title": "Combo Deal Offer", "description": "Bundle discount", "expectedImpact": "+10%" },
-    { "title": "Weekend Brunch Promo", "description": "Attract brunch crowd", "expectedImpact": "+12%" },
-    { "title": "Family Meal Deal", "description": "Cater to families", "expectedImpact": "+18%" },
-    { "title": "Student Discount", "description": "Target local students", "expectedImpact": "+7%" },
-  ];
 
   let status: "success" | "alert";
   let message: string;
@@ -37,10 +34,20 @@ export async function GET() {
     const drop = lastWeekTotal - thisWeekTotal;
     dropPercent = parseFloat(((drop / lastWeekTotal) * 100).toFixed(1));
     message = `Alert: Sales dropped by ${dropPercent}% compared to last week`;
-    
-    // Select 3 random promotional suggestions
-    const shuffled = [...promotionalSuggestions].sort(() => 0.5 - Math.random());
-    promotions = shuffled.slice(0, 3);
+
+    if (dropPercent !== undefined) {
+      try {
+        promotions = await generatePromotionalSuggestions(lastWeekTotal, thisWeekTotal, dropPercent);
+      } catch (error) {
+        console.error('Error generating promotional suggestions:', error);
+        // Fallback or default promotions in case of API error
+        promotions = [
+          { "title": "Seasonal Sale", "description": "Offer discounts on seasonal items", "expectedImpact": "+10%" },
+          { "title": "Buy One Get One Free", "description": "Encourage bulk purchases", "expectedImpact": "+15%" },
+          { "title": "Loyalty Program Bonus", "description": "Reward returning customers", "expectedImpact": "+12%" },
+        ];
+      }
+    }
   }
 
   const responseBody: any = {

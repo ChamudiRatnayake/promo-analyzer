@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "../ui/badge"
+import { useEffect, useState } from 'react';
 
 interface PromotionalInsightsProps {
   revenueChange: number
@@ -9,23 +10,57 @@ interface PromotionalInsightsProps {
 }
 
 export function PromotionalInsights({ revenueChange, ordersChange, customersChange }: PromotionalInsightsProps) {
-  const promotions = [
-    {
-      title: "10% Lunch Discount",
-      description: "Boost midday sales",
-      impact: "+8%",
-    },
-    {
-      title: "Happy Hour Special",
-      description: "2-5 PM promotion",
-      impact: "+15%",
-    },
-    {
-      title: "Combo Deal Offer",
-      description: "Bundle discount",
-      impact: "+10%",
-    },
-  ]
+  const [currentPromotions, setCurrentPromotions] = useState<any[]>([]);
+  const [lastValidPromotions, setLastValidPromotions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/sales-insights');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.status === 'alert' && data.promotions && data.promotions.length > 0) {
+          setCurrentPromotions(data.promotions);
+          setLastValidPromotions(data.promotions); // Store the last valid promotions
+        } else {
+          // If no new alert with promotions, or sales are good, display last valid promotions if any.
+          setCurrentPromotions(lastValidPromotions);
+        }
+      } catch (e: any) {
+        console.error('Error fetching promotional suggestions:', e);
+        setError(e.message);
+        setCurrentPromotions(lastValidPromotions.length > 0 ? lastValidPromotions : [
+          { title: "Seasonal Sale", description: "Offer discounts on seasonal items", expectedImpact: "+10%" },
+          { title: "Buy One Get One Free", description: "Encourage bulk purchases", expectedImpact: "+15%" },
+          { title: "Loyalty Program Bonus", description: "Reward returning customers", expectedImpact: "+12%" },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPromotions();
+  }, [lastValidPromotions]); // Add lastValidPromotions to dependency array to re-run effect when it changes
+
+  if (loading) {
+    return <div className="space-y-3"><h4 className="font-semibold text-gray-900">Loading Promotions...</h4></div>;
+  }
+
+  if (error) {
+    return <div className="space-y-3"><h4 className="font-semibold text-red-600">Error: {error}</h4></div>;
+  }
+
+  // Display message if no currentPromotions are available after loading
+  if (currentPromotions.length === 0) {
+    return <div className="space-y-3"><h4 className="font-semibold text-gray-900">No promotional suggestions at this time.</h4></div>;
+  }
 
   return (
     <div className="space-y-3">
@@ -35,7 +70,7 @@ export function PromotionalInsights({ revenueChange, ordersChange, customersChan
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {promotions.map((promotion, index) => (
+        {currentPromotions.map((promotion, index) => (
           <div
             key={index}
             className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow h-20 flex flex-col justify-between"
@@ -46,12 +81,12 @@ export function PromotionalInsights({ revenueChange, ordersChange, customersChan
                 <p className="text-xs text-gray-600 mt-1 truncate">{promotion.description}</p>
               </div>
               <div className="ml-2 flex-shrink-0">
-                <span className="text-xs font-medium text-green-600">📈 {promotion.impact}</span>
+                <span className="text-xs font-medium text-green-600">📈 {promotion.expectedImpact}</span>
               </div>
             </div>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
