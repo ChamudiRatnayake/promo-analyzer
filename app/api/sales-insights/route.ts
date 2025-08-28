@@ -43,14 +43,19 @@ export async function GET() {
     promotions = shuffled.slice(0, 3);
   }
 
-  return new Response(JSON.stringify({
+  const responseBody: any = {
     lastWeekTotal,
     thisWeekTotal,
-    dropPercent,
     status,
     message,
     promotions,
-  }), {
+  };
+
+  if (dropPercent !== undefined) {
+    responseBody.dropPercent = dropPercent;
+  }
+
+  return new Response(JSON.stringify(responseBody), {
     headers: { "Content-Type": "application/json" },
   });
 }
