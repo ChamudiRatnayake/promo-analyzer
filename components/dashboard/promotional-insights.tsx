@@ -28,7 +28,13 @@ export function PromotionalInsights({ revenueChange, ordersChange, customersChan
       setError(null);
       console.log('Fetching promotional suggestions from API...');
       try {
-        const response = await fetch('/api/sales-insights');
+        const response = await fetch('/api/sales-insights', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ revenueChange, ordersChange, customersChange }),
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

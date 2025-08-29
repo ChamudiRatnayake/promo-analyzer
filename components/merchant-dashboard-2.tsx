@@ -10,10 +10,11 @@ import { TopSellingItems } from "./dashboard/top-selling-items"
 import { SalesAlertBanner } from "./dashboard/sales-alert-banner"
 import { SalesAlertCard } from "./dashboard/sales-alert-card"
 import { InsightsModal } from "./dashboard/insights-modal"
+// Removed import { generateMockData } from "@/lib/utils"
 
 // Removed mockData for demonstration
 
-export function MerchantDashboard1({ mockData }: { mockData: any }) {
+export function MerchantDashboard2({ mockData }: { mockData: any }) {
   const alertPattern = "banner"
   const promotionPattern = "expandable"
   const [showInsightsModal, setShowInsightsModal] = useState(false)

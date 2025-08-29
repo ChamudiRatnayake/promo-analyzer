@@ -5,23 +5,58 @@ const openai = new OpenAI({
 });
 
 export async function generatePromotionalSuggestions(
-  lastWeekTotal: number,
-  thisWeekTotal: number,
-  dropPercent: number
+  revenueChange: number,
+  ordersChange: number,
+  customersChange: number
 ) {
+  let salesPerformance = "";
+  if (revenueChange < 0) {
+    salesPerformance += `Revenue has dropped by ${Math.abs(revenueChange).toFixed(1)}%. `;
+  }
+  if (ordersChange < 0) {
+    salesPerformance += `Orders have dropped by ${Math.abs(ordersChange).toFixed(1)}%. `;
+  }
+  if (customersChange < 0) {
+    salesPerformance += `Customer count has dropped by ${Math.abs(customersChange).toFixed(1)}%. `;
+  }
+  if (revenueChange >= 0 && ordersChange >= 0 && customersChange >= 0) {
+    salesPerformance = "Sales performance is stable or improving across all metrics.";
+  }
+
   const prompt = `You are a marketing expert specializing in retail promotions. 
   Your task is to generate three distinct and actionable promotional suggestions
-   for a business that has experienced a sales drop.\n\nHere is the sales data:\n- 
-   Last week's total sales: ${lastWeekTotal} USD\n- This week's total sales: ${thisWeekTotal} USD\n-
-    Percentage drop: ${dropPercent}%\n\nBased on this sales drop, provide three promotional suggestions.
-     Each suggestion should include:\n1.  **Title**: A concise title for the promotion.\n2.  **Description**:
-      A brief explanation of the promotion and how it works.\n3.  **Expected Impact**: An estimated percentage
-       increase in sales this promotion could achieve (e.g., \"+10%\", \"+15%\").\n\nFormat your response as a 
-       JSON array of objects, like this:\n\n[\n  {{\n    \"title\": \"Promotion Title 1\",\n    \"description\": 
-       \"Description of promotion 1\",\n    \"expectedImpact\": \"+X%\"\n  }},\n  {{\n    \"title\": \"Promotion Title 2\",\n  
-         \"description\": \"Description of promotion 2\",\n    \"expectedImpact\": \"+Y%\"\n  }},\n  {{\n    \"title\": \"Promotion Title 3\",\n   
-          \"description\": \"Description of promotion 3\",\n    \"expectedImpact\": \"+Z%\"\n  }}\n]\n`;
-
+  for a business based on its recent sales performance. 
+  
+  Here is the sales performance data:
+  - ${salesPerformance}
+  
+  Based on this sales performance, provide three promotional suggestions. 
+  Each suggestion should include:
+  1.  **Title**: A concise title for the promotion.
+  2.  **Description**: A brief explanation of the promotion and how it works.
+  3.  **Expected Impact**: An estimated percentage increase in sales this promotion could achieve (e.g., "+10%", "+15%").
+  
+  Format your response as a JSON array of objects, like this:
+  
+  [
+    {{
+      "title": "Promotion Title 1",
+      "description": "Description of promotion 1",
+      "expectedImpact": "+X%"
+    }},
+    {{
+      "title": "Promotion Title 2",
+      "description": "Description of promotion 2",
+      "expectedImpact": "+Y%"
+    }},
+    {{
+      "title": "Promotion Title 3",
+      "description": "Description of promotion 3",
+      "expectedImpact": "+Z%"
+    }}
+  ]
+  `;
+  
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',

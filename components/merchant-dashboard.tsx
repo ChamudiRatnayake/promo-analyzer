@@ -11,7 +11,19 @@ import { SalesAlertBanner } from "./dashboard/sales-alert-banner"
 import { SalesAlertCard } from "./dashboard/sales-alert-card"
 import { InsightsModal } from "./dashboard/insights-modal"
 
-// Removed mockData for demonstration
+// Mock data for demonstration
+const mockData = {
+  thisWeek: {
+    revenue: 2307.4,
+    orders: 127,
+    customers: 27,
+  },
+  lastWeek: {
+    revenue: 2625.5,
+    orders: 135,
+    customers: 29,
+  },
+}
 
 export function MerchantDashboard1({ mockData }: { mockData: any }) {
   const alertPattern = "banner"
