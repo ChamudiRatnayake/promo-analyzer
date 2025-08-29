@@ -1,8 +1,7 @@
 import { Bell, Search } from "lucide-react"
 import { Badge } from "../ui/badge"
 
-export function Header({ businessId }: { businessId: string }) {
-  const businessName = businessId === "BIZ_234" ? "Sweet Beans" : "Cafe Royale"
+export function Header() {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -10,7 +9,7 @@ export function Header({ businessId }: { businessId: string }) {
           <h1 className="text-2xl font-semibold text-gray-900">Welcome back, John!</h1>
           <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            {businessName} • 123 Main St, New York
+            Sweet Beans • 123 Main St, New York
           </p>
         </div>
 
