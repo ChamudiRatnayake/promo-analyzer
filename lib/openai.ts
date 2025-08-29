@@ -103,16 +103,26 @@ export async function generatePromotionalSuggestions(
   `;
   
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not set. Please set your OpenAI API key in the environment variables.");
+    }
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful assistant.' },
         { role: 'user', content: prompt },
       ],
-      response_format: { type: "json_object" },
+      response_format: { type: "json_object" }, // Changed back to json_object
     });
 
-    let parsedContent = JSON.parse(response.choices[0].message.content || '[]');
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(response.choices[0].message.content || '[]');
+    } catch (parseError) {
+      console.error('Error parsing OpenAI response as JSON:', parseError);
+      console.error('Raw OpenAI response:', response.choices[0].message.content);
+      return []; // Return empty array on parse error
+    }
 
     // If the content is an object with a 'promotions' key, use that array
     if (typeof parsedContent === 'object' && parsedContent !== null && 'promotions' in parsedContent) {

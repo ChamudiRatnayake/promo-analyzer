@@ -14,10 +14,10 @@ export default function Page({ params }: Props) {
 
   if (params.businessId === "BIZ_123") {
     mockData = generateMockData(12.1) // Original mock data's revenue drop
-    dashboardComponent = <MerchantDashboard1 mockData={mockData} />
+    dashboardComponent = <MerchantDashboard1 mockData={mockData} businessId={params.businessId} />
   } else if (params.businessId === "BIZ_234") {
     mockData = generateMockData(60) // 60% revenue drop
-    dashboardComponent = <MerchantDashboard1 mockData={mockData} />
+    dashboardComponent = <MerchantDashboard1 mockData={mockData} businessId={params.businessId} />
   } else {
     dashboardComponent = <div>Business not found</div>
   }

@@ -13,7 +13,7 @@ import { InsightsModal } from "./dashboard/insights-modal"
 
 // Removed mockData for demonstration
 
-export function MerchantDashboard1({ mockData }: { mockData: any }) {
+export function MerchantDashboard1({ mockData, businessId }: { mockData: any; businessId: string }) {
   const alertPattern = "banner"
   const promotionPattern = "expandable"
   const [showInsightsModal, setShowInsightsModal] = useState(false)
@@ -31,7 +31,7 @@ export function MerchantDashboard1({ mockData }: { mockData: any }) {
       <Sidebar showInsights={alertPattern === "sidebar"} hasAlert={hasAlert} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+        <Header businessId={businessId} />
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Sales Alert Banner */}

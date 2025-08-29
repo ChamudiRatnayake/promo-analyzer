@@ -19,14 +19,13 @@ export async function POST(request: Request) {
     try {
       // Pass all relevant changes to the AI for more accurate suggestions
       promotions = await generatePromotionalSuggestions(revenueChange, ordersChange, customersChange);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating promotional suggestions:', error);
-      // Fallback or default promotions in case of API error
-      promotions = [
-        { "title": "Seasonal Sale", "description": "Offer discounts on seasonal items", "expectedImpact": "+10%" },
-        { "title": "Buy One Get One Free", "description": "Encourage bulk purchases", "expectedImpact": "+15%" },
-        { "title": "Loyalty Program Bonus", "description": "Reward returning customers", "expectedImpact": "+12%" },
-      ];
+      // Return a 500 status code if there's an error generating promotions
+      return new Response(JSON.stringify({ error: error.message || "Failed to generate promotional suggestions" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   }
 
