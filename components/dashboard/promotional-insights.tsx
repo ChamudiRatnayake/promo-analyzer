@@ -40,6 +40,7 @@ export function PromotionalInsights({ revenueChange, ordersChange, customersChan
         }
         const data = await response.json();
         console.log('Promotional suggestions fetched successfully:', data);
+        console.log('Frontend received data.promotions:', data.promotions);
 
         if (data.promotions && data.promotions.length > 0) {
           setCurrentPromotions(data.promotions);
