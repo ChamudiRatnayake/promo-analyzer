@@ -36,6 +36,7 @@ export async function GET() {
     message = `Alert: Sales dropped by ${dropPercent}% compared to last week`;
 
     if (dropPercent !== undefined) {
+      console.log('Generating promotional suggestions...');
       try {
         promotions = await generatePromotionalSuggestions(lastWeekTotal, thisWeekTotal, dropPercent);
       } catch (error) {
@@ -48,6 +49,8 @@ export async function GET() {
         ];
       }
     }
+
+    console.log('Sales insights data fetched and processed.', { status, message, lastWeekTotal, thisWeekTotal, dropPercent, promotions: promotions.length });
   }
 
   const responseBody: any = {
